@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import TreeInput from '../Components/TreeInput';
-import ExportButtons from '../Components/ExportButtons';
+import TreeInput from '../components/TreeInput';
+import ExportButtons from '../components/ExportButtons';
 
 export default function UserDashboard() {
   const { user, updateUser } = useAuth();

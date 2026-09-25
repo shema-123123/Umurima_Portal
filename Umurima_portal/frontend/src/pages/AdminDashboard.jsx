@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import ExportButtons from '../Components/ExportButtons';
+import ExportButtons from '../components/ExportButtons';
 import {
   BarChart,
   Bar,
