@@ -37,7 +37,7 @@ export default function UserDashboard() {
 
   const loadFarms = async () => {
     try {
-      const { data } = await axios.get('http://localhost:5000/api/farms/my-farms', authHeader);
+      const { data } = await axios.get('https://umurima-portal-0ulc.onrender.com/api/farms/my-farms', authHeader);
       setFarms(data);
     } catch (err) {
       console.error(err);
@@ -83,7 +83,7 @@ export default function UserDashboard() {
     e.preventDefault();
     try {
       const { data } = await axios.put(
-        `http://localhost:5000/api/users/${user._id}`,
+        `https://umurima-portal-0ulc.onrender.com/api/users/${user._id}`,
         profile,
         authHeader
       );
@@ -97,7 +97,7 @@ export default function UserDashboard() {
   const deleteFarm = async (id) => {
     if (!window.confirm('Urabyemeza gusiba uyu murima?')) return;
     try {
-      await axios.delete(`http://localhost:5000/api/farms/${id}`, authHeader);
+      await axios.delete(`https://umurima-portal-0ulc.onrender.com/api/farms/${id}`, authHeader);
       showMsg('✅ Umurima wasibwe!');
       loadFarms();
     } catch (err) {
@@ -119,8 +119,8 @@ export default function UserDashboard() {
             <p className="text-gray-600">Ubuyobozi bw'umurima wawe</p>
           </div>
           <ExportButtons
-            excelUrl="http://localhost:5000/api/export/my-farms/excel"
-            pdfUrl="http://localhost:5000/api/export/my-farms/pdf"
+            excelUrl="https://umurima-portal-0ulc.onrender.com/api/export/my-farms/excel"
+            pdfUrl="https://umurima-portal-0ulc.onrender.com/api/export/my-farms/pdf"
             baseName="imirima_yanjye"
           />
         </div>

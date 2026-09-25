@@ -20,14 +20,14 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (username, password) => {
-    const { data } = await axios.post('http://localhost:5000/api/auth/login', { username, password });
+    const { data } = await axios.post('https://umurima-portal-0ulc.onrender.com/api/auth/login', { username, password });
     localStorage.setItem('abahinzi_user', JSON.stringify(data));
     setUser(data);
     return data;
   };
 
   const register = async (payload) => {
-    const { data } = await axios.post('http://localhost:5000/api/auth/register', payload);
+    const { data } = await axios.post('https://umurima-portal-0ulc.onrender.com/api/auth/register', payload);
     localStorage.setItem('abahinzi_user', JSON.stringify(data));
     setUser(data);
     return data;
