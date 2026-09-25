@@ -12,7 +12,7 @@ const exportRoutes = require('./routes/export');
 const app = express();
 
 app.use(cors({
-    origin:'http://localhost:5173'
+    origin:'https://umurima-portal.onrender.com'
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
