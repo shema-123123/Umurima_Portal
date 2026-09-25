@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
+// Icons served as images from the lucide-static CDN (unpkg) — no bundling needed.
+const ICON = (name) => `https://unpkg.com/lucide-static@latest/icons/${name}.svg`;
+
 export default function Login() {
   const [form, setForm] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
@@ -18,7 +21,7 @@ export default function Login() {
       navigate(data.role === 'admin' ? '/admin' : '/dashboard');
     } catch (err) {
       setError(
-        err.response?.data?.message || 'Habaye ikibazo. Ongera ugerageze.'
+        err.response?.data?.message || 'Something went wrong. Please try again.'
       );
     } finally {
       setLoading(false);
@@ -26,71 +29,92 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-green-50 to-emerald-100 py-10 px-4">
-      <div className="card w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-black via-blue-950 to-sky-900 py-10 px-4">
+      <div className="bg-white rounded-2xl shadow-2xl border-t-4 border-red-600 w-full max-w-md p-8">
         <div className="text-center mb-6">
-          <div className="text-5xl mb-2">🔐</div>
-          <h2 className="text-3xl font-bold text-primary-dark">Injira</h2>
-          <p className="text-gray-500 text-sm">Injira kuri konti yawe</p>
+          <div className="w-14 h-14 mx-auto mb-3 rounded-full bg-blue-50 flex items-center justify-center">
+            <img src={ICON('lock-keyhole')} alt="" className="w-7 h-7" />
+          </div>
+          <h2 className="text-3xl font-bold text-blue-900">Login</h2>
+          <p className="text-gray-500 text-sm">Sign in to your account</p>
         </div>
 
         {error && (
-          <div className="bg-red-100 text-red-700 p-3 rounded-lg mb-4 text-center text-sm">
+          <div className="flex items-center gap-2 bg-red-50 text-red-700 border border-red-200 p-3 rounded-lg mb-4 text-sm">
+            <img src={ICON('circle-alert')} alt="" className="w-4 h-4 shrink-0" />
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-semibold mb-1">Username</label>
-            <input
-              type="text"
-              placeholder="Shyiramo username"
-              className="input-field"
-              value={form.username}
-              onChange={(e) => setForm({ ...form, username: e.target.value })}
-              required
-            />
+            <label className="block text-sm font-semibold mb-1 text-gray-700">
+              Username
+            </label>
+            <div className="relative">
+              <img
+                src={ICON('user')}
+                alt=""
+                className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 opacity-50"
+              />
+              <input
+                type="text"
+                placeholder="Enter your username"
+                className="w-full pl-9 pr-3 py-2 rounded-lg border border-sky-300 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400 transition"
+                value={form.username}
+                onChange={(e) => setForm({ ...form, username: e.target.value })}
+                required
+              />
+            </div>
           </div>
           <div>
-            <label className="block text-sm font-semibold mb-1">Password</label>
-            <input
-              type="password"
-              placeholder="Shyiramo password"
-              className="input-field"
-              value={form.password}
-              onChange={(e) => setForm({ ...form, password: e.target.value })}
-              required
-            />
+            <label className="block text-sm font-semibold mb-1 text-gray-700">
+              Password
+            </label>
+            <div className="relative">
+              <img
+                src={ICON('key-round')}
+                alt=""
+                className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 opacity-50"
+              />
+              <input
+                type="password"
+                placeholder="Enter your password"
+                className="w-full pl-9 pr-3 py-2 rounded-lg border border-sky-300 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400 transition"
+                value={form.password}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                required
+              />
+            </div>
           </div>
-          <button type="submit" disabled={loading} className="btn-primary w-full">
-            {loading ? '⏳ Turimo...' : 'Injira'}
+          <button
+            type="submit"
+            disabled={loading}
+            className="flex items-center justify-center gap-2 w-full bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-2.5 rounded-lg shadow shadow-red-900/30 transition"
+          >
+            {loading ? (
+              <>
+                <img src={ICON('loader-circle')} alt="" className="w-4 h-4 invert animate-spin" />
+                Signing in...
+              </>
+            ) : (
+              <>
+                <img src={ICON('log-in')} alt="" className="w-4 h-4 invert" />
+                Login
+              </>
+            )}
           </button>
         </form>
 
         <p className="text-center mt-4 text-gray-600 text-sm">
-          Nta konti ufite?{' '}
+          Don't have an account?{' '}
           <Link
             to="/register"
-            className="text-primary font-semibold hover:underline"
+            className="text-blue-800 font-semibold hover:text-sky-600 hover:underline transition"
           >
-            Iyandikishe
+            Register
           </Link>
         </p>
-
-        <div className="mt-6 p-3 bg-blue-50 rounded-lg text-xs text-gray-700 border border-blue-200">
-          <p className="font-bold mb-2 text-center">🧪 Demo Credentials:</p>
-          <div className="grid grid-cols-2 gap-2">
-            <div className="text-center p-2 bg-white rounded">
-              <p className="font-semibold text-purple-700">Admin</p>
-              <p>admin / admin123</p>
-            </div>
-            <div className="text-center p-2 bg-white rounded">
-              <p className="font-semibold text-green-700">User</p>
-              <p>umuhinzi1 / user123</p>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );

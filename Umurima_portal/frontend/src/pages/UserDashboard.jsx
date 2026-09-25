@@ -4,6 +4,9 @@ import { useAuth } from '../context/AuthContext';
 import TreeInput from '../components/TreeInput';
 import ExportButtons from '../components/ExportButtons';
 
+// Icons served as images from the lucide-static CDN (unpkg) — no bundling needed.
+const ICON = (name) => `https://unpkg.com/lucide-static@latest/icons/${name}.svg`;
+
 export default function UserDashboard() {
   const { user, updateUser } = useAuth();
   const [tab, setTab] = useState('farms');
@@ -71,11 +74,11 @@ export default function UserDashboard() {
         treeCount: 0,
         treeTypes: [],
       });
-      showMsg('✅ Umurima wongeweho neza!');
+      showMsg('Farm added successfully!');
       loadFarms();
       setTab('farms');
     } catch (err) {
-      showMsg(err.response?.data?.message || 'Habaye ikibazo', 'error');
+      showMsg(err.response?.data?.message || 'Something went wrong', 'error');
     }
   };
 
@@ -88,20 +91,20 @@ export default function UserDashboard() {
         authHeader
       );
       updateUser(data);
-      showMsg('✅ Umwirondoro wahinduwe!');
+      showMsg('Profile updated!');
     } catch (err) {
-      showMsg(err.response?.data?.message || 'Habaye ikibazo', 'error');
+      showMsg(err.response?.data?.message || 'Something went wrong', 'error');
     }
   };
 
   const deleteFarm = async (id) => {
-    if (!window.confirm('Urabyemeza gusiba uyu murima?')) return;
+    if (!window.confirm('Are you sure you want to delete this farm?')) return;
     try {
       await axios.delete(`https://umurima-portal-0ulc.onrender.com/api/farms/${id}`, authHeader);
-      showMsg('✅ Umurima wasibwe!');
+      showMsg('Farm deleted!');
       loadFarms();
     } catch (err) {
-      showMsg('Habaye ikibazo', 'error');
+      showMsg('Something went wrong', 'error');
     }
   };
 
@@ -109,66 +112,73 @@ export default function UserDashboard() {
   const totalTrees = farms.reduce((a, f) => a + (f.treeCount || 0), 0);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-sky-50 to-blue-50 py-8">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-between items-center mb-6 flex-wrap gap-3">
           <div>
-            <h1 className="text-3xl font-bold text-primary-dark">
-              🌱 Muraho, {user.username}!
+            <h1 className="flex items-center gap-2 text-3xl font-extrabold text-blue-900">
+              <img src={ICON('sprout')} alt="" className="w-7 h-7" />
+              Hello, {user.username}!
             </h1>
-            <p className="text-gray-600">Ubuyobozi bw'umurima wawe</p>
+            <p className="text-gray-600">Manage your farm</p>
           </div>
           <ExportButtons
             excelUrl="https://umurima-portal-0ulc.onrender.com/api/export/my-farms/excel"
             pdfUrl="https://umurima-portal-0ulc.onrender.com/api/export/my-farms/pdf"
-            baseName="imirima_yanjye"
+            baseName="my_farms"
           />
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-          <div className="card text-center">
-            <p className="text-gray-500 text-sm">Imirima</p>
-            <p className="text-3xl font-bold text-primary">{farms.length}</p>
-          </div>
-          <div className="card text-center">
-            <p className="text-gray-500 text-sm">Ingano yose (ha)</p>
-            <p className="text-3xl font-bold text-primary">
-              {totalSize.toFixed(2)}
-            </p>
-          </div>
-          <div className="card text-center">
-            <p className="text-gray-500 text-sm">Ibiti byose</p>
-            <p className="text-3xl font-bold text-primary">{totalTrees}</p>
-          </div>
+          {[
+            { icon: 'map', label: 'Farms', value: farms.length },
+            { icon: 'ruler', label: 'Total Size (ha)', value: totalSize.toFixed(2) },
+            { icon: 'trees', label: 'Total Trees', value: totalTrees },
+          ].map((c, i) => (
+            <div
+              key={i}
+              className="bg-white rounded-xl border border-sky-200 shadow-sm p-5 text-center"
+            >
+              <img src={ICON(c.icon)} alt="" className="w-6 h-6 mx-auto mb-2 opacity-70" />
+              <p className="text-gray-500 text-sm">{c.label}</p>
+              <p className="text-3xl font-bold text-blue-900">{c.value}</p>
+            </div>
+          ))}
         </div>
 
         {msg.text && (
           <div
-            className={`p-3 rounded-lg mb-4 ${
+            className={`flex items-center gap-2 p-3 rounded-lg mb-4 text-sm ${
               msg.type === 'error'
-                ? 'bg-red-100 text-red-700'
-                : 'bg-green-100 text-green-700'
+                ? 'bg-red-50 text-red-700 border border-red-200'
+                : 'bg-sky-50 text-blue-800 border border-sky-200'
             }`}
           >
+            <img
+              src={ICON(msg.type === 'error' ? 'circle-alert' : 'circle-check')}
+              alt=""
+              className="w-4 h-4 shrink-0"
+            />
             {msg.text}
           </div>
         )}
 
-        <div className="flex gap-2 mb-6 border-b overflow-x-auto">
+        <div className="flex gap-2 mb-6 border-b border-sky-200 overflow-x-auto">
           {[
-            { id: 'farms', label: 'Imirima Yanjye' },
-            { id: 'add-farm', label: '➕ Ongeraho Umurima' },
-            { id: 'profile', label: '👤 Umwirondoro' },
+            { id: 'farms', label: 'My Farms', icon: 'sprout' },
+            { id: 'add-farm', label: 'Add Farm', icon: 'plus' },
+            { id: 'profile', label: 'Profile', icon: 'user' },
           ].map((t) => (
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
-              className={`px-4 py-2 font-semibold whitespace-nowrap transition ${
+              className={`flex items-center gap-2 px-4 py-2 font-semibold whitespace-nowrap transition ${
                 tab === t.id
-                  ? 'border-b-2 border-primary text-primary'
-                  : 'text-gray-500 hover:text-gray-700'
+                  ? 'border-b-2 border-blue-900 text-blue-900'
+                  : 'text-gray-500 hover:text-blue-800'
               }`}
             >
+              <img src={ICON(t.icon)} alt="" className={`w-4 h-4 ${tab === t.id ? '' : 'opacity-60'}`} />
               {t.label}
             </button>
           ))}
@@ -177,60 +187,74 @@ export default function UserDashboard() {
         {tab === 'farms' && (
           <>
             {loading ? (
-              <p className="text-center text-gray-500 py-10">⏳ Turimo...</p>
+              <div className="flex items-center justify-center gap-2 text-gray-500 py-10">
+                <img src={ICON('loader-circle')} alt="" className="w-5 h-5 animate-spin opacity-60" />
+                Loading...
+              </div>
             ) : farms.length === 0 ? (
-              <div className="card text-center py-10">
-                <p className="text-5xl mb-3">🌾</p>
-                <p className="text-gray-500 mb-4">Nta mirima ufite.</p>
+              <div className="bg-white rounded-xl border border-sky-200 shadow-sm text-center py-12">
+                <img src={ICON('wheat')} alt="" className="w-12 h-12 mx-auto mb-3 opacity-60" />
+                <p className="text-gray-500 mb-4">You don't have any farms yet.</p>
                 <button
                   onClick={() => setTab('add-farm')}
-                  className="btn-primary"
+                  className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-semibold px-5 py-2.5 rounded-lg shadow shadow-red-900/30 transition"
                 >
-                  ➕ Ongeraho Umurima wa Mbere
+                  <img src={ICON('plus')} alt="" className="w-4 h-4 invert" />
+                  Add Your First Farm
                 </button>
               </div>
             ) : (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {farms.map((f) => (
-                  <div key={f._id} className="card hover:shadow-lg transition">
-                    <h3 className="font-bold text-lg text-primary-dark mb-2">
+                  <div
+                    key={f._id}
+                    className="bg-white rounded-xl border border-sky-200 shadow-sm hover:shadow-lg transition p-5"
+                  >
+                    <h3 className="font-bold text-lg text-blue-900 mb-2">
                       {f.farmName}
                     </h3>
-                    <div className="space-y-1 text-sm text-gray-600 mb-2">
-                      <p>
-                        🌾 Igihingwa: <strong>{f.cropType}</strong>
+                    <div className="space-y-1.5 text-sm text-gray-600 mb-2">
+                      <p className="flex items-center gap-1.5">
+                        <img src={ICON('sprout')} alt="" className="w-3.5 h-3.5 opacity-60" />
+                        Crop: <strong className="text-gray-800">{f.cropType}</strong>
                       </p>
-                      <p>
-                        📏 Ingano: <strong>{f.size} ha</strong>
+                      <p className="flex items-center gap-1.5">
+                        <img src={ICON('ruler')} alt="" className="w-3.5 h-3.5 opacity-60" />
+                        Size: <strong className="text-gray-800">{f.size} ha</strong>
                       </p>
-                      <p>📍 {f.location}</p>
-                      <p>🪨 Ubutaka: {f.soilType}</p>
+                      <p className="flex items-center gap-1.5">
+                        <img src={ICON('map-pin')} alt="" className="w-3.5 h-3.5 opacity-60" />
+                        {f.location}
+                      </p>
+                      <p className="flex items-center gap-1.5">
+                        <img src={ICON('mountain')} alt="" className="w-3.5 h-3.5 opacity-60" />
+                        Soil: {f.soilType}
+                      </p>
                       {f.plantingDate && (
-                        <p>
-                          📅 Gutera:{' '}
-                          {new Date(f.plantingDate).toLocaleDateString('rw-RW')}
+                        <p className="flex items-center gap-1.5">
+                          <img src={ICON('calendar')} alt="" className="w-3.5 h-3.5 opacity-60" />
+                          Planted: {new Date(f.plantingDate).toLocaleDateString('en-GB')}
                         </p>
                       )}
                       {f.expectedHarvest && (
-                        <p>
-                          🌾 Gusarura:{' '}
-                          {new Date(f.expectedHarvest).toLocaleDateString(
-                            'rw-RW'
-                          )}
+                        <p className="flex items-center gap-1.5">
+                          <img src={ICON('calendar-check')} alt="" className="w-3.5 h-3.5 opacity-60" />
+                          Harvest: {new Date(f.expectedHarvest).toLocaleDateString('en-GB')}
                         </p>
                       )}
                     </div>
 
-                    <div className="p-2 bg-green-50 rounded mt-2">
-                      <p className="text-sm font-semibold text-green-800">
-                        🌳 Ibiti: {f.treeCount || 0}
+                    <div className="p-2.5 bg-blue-50 rounded-lg mt-2 border border-sky-100">
+                      <p className="flex items-center gap-1.5 text-sm font-semibold text-blue-900">
+                        <img src={ICON('trees')} alt="" className="w-3.5 h-3.5" />
+                        Trees: {f.treeCount || 0}
                       </p>
                       {f.treeTypes?.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-1">
+                        <div className="flex flex-wrap gap-1 mt-1.5">
                           {f.treeTypes.map((t) => (
                             <span
                               key={t}
-                              className="text-xs bg-green-200 text-green-900 px-2 py-0.5 rounded"
+                              className="text-xs bg-sky-100 text-blue-800 px-2 py-0.5 rounded-full font-medium"
                             >
                               {t}
                             </span>
@@ -240,16 +264,18 @@ export default function UserDashboard() {
                     </div>
 
                     {f.notes && (
-                      <p className="text-xs text-gray-500 mt-2 italic">
-                        📝 {f.notes}
+                      <p className="flex items-start gap-1.5 text-xs text-gray-500 mt-2 italic">
+                        <img src={ICON('sticky-note')} alt="" className="w-3.5 h-3.5 mt-0.5 shrink-0 opacity-50" />
+                        {f.notes}
                       </p>
                     )}
 
                     <button
                       onClick={() => deleteFarm(f._id)}
-                      className="mt-3 text-red-500 text-sm hover:underline"
+                      className="flex items-center gap-1 mt-3 text-red-600 hover:text-red-800 text-sm font-medium transition"
                     >
-                      🗑️ Siba
+                      <img src={ICON('trash-2')} alt="" className="w-3.5 h-3.5" />
+                      Delete
                     </button>
                   </div>
                 ))}
@@ -259,18 +285,22 @@ export default function UserDashboard() {
         )}
 
         {tab === 'add-farm' && (
-          <form onSubmit={addFarm} className="card max-w-2xl mx-auto space-y-3">
-            <h3 className="text-xl font-bold text-primary-dark mb-2">
-              ➕ Ongeraho Umurima Mushya
+          <form
+            onSubmit={addFarm}
+            className="bg-white rounded-xl border border-sky-200 shadow-sm max-w-2xl mx-auto p-6 space-y-3"
+          >
+            <h3 className="flex items-center gap-2 text-xl font-bold text-blue-900 mb-2">
+              <img src={ICON('plus')} alt="" className="w-5 h-5" />
+              Add a New Farm
             </h3>
 
             <div>
-              <label className="block text-sm font-semibold mb-1">
-                Izina ry'Umurima *
+              <label className="block text-sm font-semibold mb-1 text-gray-700">
+                Farm Name *
               </label>
               <input
-                className="input-field"
-                placeholder="Urugero: Umurima wa Mbere"
+                className="w-full px-3 py-2 rounded-lg border border-sky-300 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400 transition"
+                placeholder="e.g. My First Farm"
                 required
                 value={newFarm.farmName}
                 onChange={(e) =>
@@ -281,12 +311,12 @@ export default function UserDashboard() {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-semibold mb-1">
-                  Igihingwa *
+                <label className="block text-sm font-semibold mb-1 text-gray-700">
+                  Crop *
                 </label>
                 <input
-                  className="input-field"
-                  placeholder="Ibigori, Ibirayi..."
+                  className="w-full px-3 py-2 rounded-lg border border-sky-300 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400 transition"
+                  placeholder="Maize, Potatoes..."
                   required
                   value={newFarm.cropType}
                   onChange={(e) =>
@@ -295,15 +325,15 @@ export default function UserDashboard() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold mb-1">
-                  Ingano (ha) *
+                <label className="block text-sm font-semibold mb-1 text-gray-700">
+                  Size (ha) *
                 </label>
                 <input
-                  className="input-field"
+                  className="w-full px-3 py-2 rounded-lg border border-sky-300 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400 transition"
                   type="number"
                   step="0.1"
                   min="0"
-                  placeholder="Urugero: 2.5"
+                  placeholder="e.g. 2.5"
                   required
                   value={newFarm.size}
                   onChange={(e) =>
@@ -314,12 +344,12 @@ export default function UserDashboard() {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold mb-1">
-                Aho Uherereye *
+              <label className="block text-sm font-semibold mb-1 text-gray-700">
+                Location *
               </label>
               <input
-                className="input-field"
-                placeholder="Urugero: Gasabo - Ndera"
+                className="w-full px-3 py-2 rounded-lg border border-sky-300 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400 transition"
+                placeholder="e.g. Gasabo - Ndera"
                 required
                 value={newFarm.location}
                 onChange={(e) =>
@@ -329,11 +359,11 @@ export default function UserDashboard() {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold mb-1">
-                Ubwoko bw'Ubutaka
+              <label className="block text-sm font-semibold mb-1 text-gray-700">
+                Soil Type
               </label>
               <input
-                className="input-field"
+                className="w-full px-3 py-2 rounded-lg border border-sky-300 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400 transition"
                 placeholder="Loam, Volcanic..."
                 value={newFarm.soilType}
                 onChange={(e) =>
@@ -344,12 +374,12 @@ export default function UserDashboard() {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-semibold mb-1">
-                  Italiki yo Gutera
+                <label className="block text-sm font-semibold mb-1 text-gray-700">
+                  Planting Date
                 </label>
                 <input
                   type="date"
-                  className="input-field"
+                  className="w-full px-3 py-2 rounded-lg border border-sky-300 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400 transition"
                   value={newFarm.plantingDate}
                   onChange={(e) =>
                     setNewFarm({ ...newFarm, plantingDate: e.target.value })
@@ -357,12 +387,12 @@ export default function UserDashboard() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold mb-1">
-                  Italiki yo Gusarura
+                <label className="block text-sm font-semibold mb-1 text-gray-700">
+                  Expected Harvest
                 </label>
                 <input
                   type="date"
-                  className="input-field"
+                  className="w-full px-3 py-2 rounded-lg border border-sky-300 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400 transition"
                   value={newFarm.expectedHarvest}
                   onChange={(e) =>
                     setNewFarm({ ...newFarm, expectedHarvest: e.target.value })
@@ -380,13 +410,13 @@ export default function UserDashboard() {
             />
 
             <div>
-              <label className="block text-sm font-semibold mb-1">
-                Andi Makuru
+              <label className="block text-sm font-semibold mb-1 text-gray-700">
+                Additional Notes
               </label>
               <textarea
-                className="input-field"
+                className="w-full px-3 py-2 rounded-lg border border-sky-300 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400 transition"
                 rows={3}
-                placeholder="Andi makuru ku murima..."
+                placeholder="Any additional notes about the farm..."
                 value={newFarm.notes}
                 onChange={(e) =>
                   setNewFarm({ ...newFarm, notes: e.target.value })
@@ -394,8 +424,12 @@ export default function UserDashboard() {
               />
             </div>
 
-            <button type="submit" className="btn-primary w-full">
-              💾 Bika Umurima
+            <button
+              type="submit"
+              className="flex items-center justify-center gap-2 w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2.5 rounded-lg shadow shadow-red-900/30 transition"
+            >
+              <img src={ICON('save')} alt="" className="w-4 h-4 invert" />
+              Save Farm
             </button>
           </form>
         )}
@@ -403,25 +437,26 @@ export default function UserDashboard() {
         {tab === 'profile' && (
           <form
             onSubmit={updateProfile}
-            className="card max-w-2xl mx-auto space-y-3"
+            className="bg-white rounded-xl border border-sky-200 shadow-sm max-w-2xl mx-auto p-6 space-y-3"
           >
-            <h3 className="text-xl font-bold text-primary-dark mb-2">
-              👤 Umwirondoro
+            <h3 className="flex items-center gap-2 text-xl font-bold text-blue-900 mb-2">
+              <img src={ICON('user')} alt="" className="w-5 h-5" />
+              Profile
             </h3>
 
-            <div className="bg-gray-50 p-3 rounded-lg">
+            <div className="bg-blue-50 border border-sky-100 p-3 rounded-lg">
               <p className="text-sm text-gray-500">
-                Indangamuntu (ntishobora guhinduka)
+                ID Number (cannot be changed)
               </p>
-              <p className="font-mono font-bold">{user.identityNumber}</p>
+              <p className="font-mono font-bold text-blue-900">{user.identityNumber}</p>
             </div>
 
             <div>
-              <label className="block text-sm font-semibold mb-1">
+              <label className="block text-sm font-semibold mb-1 text-gray-700">
                 Username
               </label>
               <input
-                className="input-field"
+                className="w-full px-3 py-2 rounded-lg border border-sky-300 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400 transition"
                 value={profile.username}
                 onChange={(e) =>
                   setProfile({ ...profile, username: e.target.value })
@@ -430,11 +465,11 @@ export default function UserDashboard() {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold mb-1">
-                Telefone
+              <label className="block text-sm font-semibold mb-1 text-gray-700">
+                Phone
               </label>
               <input
-                className="input-field"
+                className="w-full px-3 py-2 rounded-lg border border-sky-300 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400 transition"
                 value={profile.telephone}
                 onChange={(e) =>
                   setProfile({ ...profile, telephone: e.target.value })
@@ -443,11 +478,11 @@ export default function UserDashboard() {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold mb-1">
-                Aho Utuye
+              <label className="block text-sm font-semibold mb-1 text-gray-700">
+                Location
               </label>
               <input
-                className="input-field"
+                className="w-full px-3 py-2 rounded-lg border border-sky-300 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400 transition"
                 value={profile.location}
                 onChange={(e) =>
                   setProfile({ ...profile, location: e.target.value })
@@ -455,8 +490,12 @@ export default function UserDashboard() {
               />
             </div>
 
-            <button type="submit" className="btn-primary w-full">
-              💾 Bika Impinduka
+            <button
+              type="submit"
+              className="flex items-center justify-center gap-2 w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2.5 rounded-lg shadow shadow-red-900/30 transition"
+            >
+              <img src={ICON('save')} alt="" className="w-4 h-4 invert" />
+              Save Changes
             </button>
           </form>
         )}

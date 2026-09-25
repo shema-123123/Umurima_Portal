@@ -1,18 +1,21 @@
 import { useState } from 'react';
 
+// Icons served as images from the lucide-static CDN (unpkg) — no bundling needed.
+const ICON = (name) => `https://unpkg.com/lucide-static@latest/icons/${name}.svg`;
+
 const COMMON_TREES = [
-  'Imyembe',
-  'Avoka',
-  'Ibitoke',
-  'Papayi',
-  'Kawunga',
-  'Amacunga',
-  'Indimu',
-  'Iberi',
-  'Umusekera',
-  'Ibitungurusu',
-  'Umwembe',
-  'Umurehe',
+  'Mango',
+  'Avocado',
+  'Banana',
+  'Papaya',
+  'Cassava',
+  'Orange',
+  'Lemon',
+  'Guava',
+  'Passion Fruit',
+  'Onion',
+  'Coffee',
+  'Palm Tree',
 ];
 
 export default function TreeInput({ treeCount, treeTypes, onChange }) {
@@ -34,19 +37,20 @@ export default function TreeInput({ treeCount, treeTypes, onChange }) {
   };
 
   return (
-    <div className="border-2 border-dashed border-green-300 rounded-lg p-4 bg-green-50">
-      <h4 className="font-bold text-primary-dark mb-3 flex items-center gap-2">
-        🌳 Ibiti Yaterewe
+    <div className="border-2 border-dashed border-sky-300 rounded-xl p-5 bg-blue-50">
+      <h4 className="font-bold text-blue-900 mb-4 flex items-center gap-2">
+        <img src={ICON('trees')} alt="" className="w-5 h-5" />
+        Trees Planted
       </h4>
 
       <label className="block text-sm font-semibold mb-1 text-gray-700">
-        Umubare w'Ibiti
+        Number of Trees
       </label>
       <input
         type="number"
         min="0"
-        className="input-field mb-3"
-        placeholder="Urugero: 50"
+        className="w-full mb-4 px-3 py-2 rounded-lg border border-sky-300 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400 transition"
+        placeholder="e.g. 50"
         value={treeCount}
         onChange={(e) =>
           onChange({ treeCount: Number(e.target.value) || 0, treeTypes })
@@ -54,9 +58,9 @@ export default function TreeInput({ treeCount, treeTypes, onChange }) {
       />
 
       <label className="block text-sm font-semibold mb-2 text-gray-700">
-        Ubwoko bw'Ibiti (hitamo imwe cyangwa nyinshi)
+        Tree Types (select one or more)
       </label>
-      <div className="flex flex-wrap gap-2 mb-3">
+      <div className="flex flex-wrap gap-2 mb-4">
         {COMMON_TREES.map((tree) => {
           const selected = treeTypes.includes(tree);
           return (
@@ -64,13 +68,17 @@ export default function TreeInput({ treeCount, treeTypes, onChange }) {
               key={tree}
               type="button"
               onClick={() => toggleTree(tree)}
-              className={`px-3 py-1 rounded-full text-sm border transition ${
+              className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm border font-medium transition ${
                 selected
-                  ? 'bg-primary text-white border-primary'
-                  : 'bg-white text-gray-700 border-gray-300 hover:border-primary'
+                  ? 'bg-blue-900 text-white border-blue-900 shadow-sm'
+                  : 'bg-white text-gray-700 border-gray-300 hover:border-sky-400 hover:text-blue-900'
               }`}
             >
-              {selected ? '✓ ' : '+ '}
+              <img
+                src={ICON(selected ? 'check' : 'plus')}
+                alt=""
+                className={`w-3.5 h-3.5 ${selected ? 'invert' : 'opacity-60'}`}
+              />
               {tree}
             </button>
           );
@@ -78,13 +86,13 @@ export default function TreeInput({ treeCount, treeTypes, onChange }) {
       </div>
 
       <label className="block text-sm font-semibold mb-1 text-gray-700">
-        Ongeraho ubwoko bushya
+        Add a New Type
       </label>
       <div className="flex gap-2">
         <input
           type="text"
-          className="input-field flex-1"
-          placeholder="Andika ubwoko bushya..."
+          className="flex-1 px-3 py-2 rounded-lg border border-sky-300 bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400 transition"
+          placeholder="Type a new tree name..."
           value={custom}
           onChange={(e) => setCustom(e.target.value)}
           onKeyDown={(e) => {
@@ -94,27 +102,33 @@ export default function TreeInput({ treeCount, treeTypes, onChange }) {
             }
           }}
         />
-        <button type="button" onClick={addCustom} className="btn-primary">
-          Ongeraho
+        <button
+          type="button"
+          onClick={addCustom}
+          className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold shadow shadow-red-900/30 transition"
+        >
+          <img src={ICON('plus')} alt="" className="w-4 h-4 invert" />
+          Add
         </button>
       </div>
 
       {treeTypes.length > 0 && (
-        <div className="mt-3 p-2 bg-white rounded border border-green-200">
-          <p className="text-xs text-gray-500 mb-1">
-            Byatoranyijwe ({treeTypes.length}):
+        <div className="mt-4 p-3 bg-white rounded-lg border border-sky-200">
+          <p className="text-xs text-gray-500 mb-2">
+            Selected ({treeTypes.length}):
           </p>
-          <div className="flex flex-wrap gap-1">
+          <div className="flex flex-wrap gap-1.5">
             {treeTypes.map((t) => (
               <span
                 key={t}
-                className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded flex items-center gap-1"
+                className="bg-sky-100 text-blue-900 text-xs font-medium px-2.5 py-1 rounded-full flex items-center gap-1.5"
               >
                 {t}
                 <button
                   type="button"
                   onClick={() => toggleTree(t)}
-                  className="text-red-500 hover:text-red-700 font-bold"
+                  className="text-red-600 hover:text-red-800 font-bold leading-none"
+                  aria-label={`Remove ${t}`}
                 >
                   ×
                 </button>

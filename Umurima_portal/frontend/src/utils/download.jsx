@@ -29,7 +29,7 @@ export const downloadFile = async (url, token, filename) => {
     return true;
   } catch (err) {
     console.error('Download error:', err);
-    alert('Habaye ikibazo mu kubikuza file. Ongera ugerageze.');
+    alert('Something went wrong while downloading the file. Please try again.');
     return false;
   }
 };
