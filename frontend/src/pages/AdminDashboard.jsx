@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
-import ExportButtons from './components/ExportButtons';
+import ExportButtons from '../Components/ExportButtons';
 import {
   BarChart,
   Bar,
@@ -40,9 +40,9 @@ export default function AdminDashboard() {
     const load = async () => {
       try {
         const [u, f, s] = await Promise.all([
-          axios.get('/api/users', authHeader),
-          axios.get('/api/farms', authHeader),
-          axios.get('/api/analytics/stats', authHeader),
+          axios.get('http://localhost:5000/api/users', authHeader),
+          axios.get('http://localhost:5000/api/farms', authHeader),
+          axios.get('http://localhost:5000/api/analytics/stats', authHeader),
         ]);
         setUsers(u.data);
         setFarms(f.data);
@@ -60,7 +60,7 @@ export default function AdminDashboard() {
   const deleteUser = async (id) => {
     if (!window.confirm('Urabyemeza gusiba uyu mukoresha?')) return;
     try {
-      await axios.delete(`/api/users/${id}`, authHeader);
+      await axios.delete(`http://localhost:5000/api/users/${id}`, authHeader);
       setUsers(users.filter((u) => u._id !== id));
     } catch (err) {
       alert(err.response?.data?.message || 'Habaye ikibazo');
