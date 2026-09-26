@@ -26,7 +26,7 @@ export default function UserDashboard() {
     plantingDate: '',
     expectedHarvest: '',
     notes: '',
-    treeCount: 0,
+    treeCount: '',
     treeTypes: [],
   });
   const [msg, setMsg] = useState({ text: '', type: '' });
