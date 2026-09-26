@@ -58,7 +58,7 @@ export default function UserDashboard() {
     e.preventDefault();
     try {
       await axios.post(
-        '/api/farms',
+        'https://umurima-portal-0ulc.onrender.com/api/farms',
         { ...newFarm, size: Number(newFarm.size) },
         authHeader
       );
