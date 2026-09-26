@@ -71,7 +71,7 @@ export default function UserDashboard() {
         plantingDate: '',
         expectedHarvest: '',
         notes: '',
-        treeCount: 0,
+        treeCount: '',
         treeTypes: [],
       });
       showMsg('Farm added successfully!');
